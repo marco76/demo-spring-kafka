@@ -1,7 +1,8 @@
 package dev.marco.demokafka;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,7 +14,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 @SpringBootApplication
 public class DemoKafkaApplication {
 
-    private final String TOPIC_NAME = "kafka-spring-demo";
+    private final Log log = LogFactory.getLog(DemoKafkaApplication.class);
+
+    private static final String TOPIC_NAME = "kafka-spring-demo";
 
     public static void main(String[] args) {
         SpringApplication.run(DemoKafkaApplication.class, args);
@@ -32,13 +35,11 @@ public class DemoKafkaApplication {
 
     @KafkaListener(id = "kafka-spring-listener", topics = TOPIC_NAME )
     public void listen(String message) {
-        System.out.println("message received:" + message);
+        log.info("message received: " + message );
     }
 
     @Bean
     public ApplicationRunner runner(KafkaTemplate<String, String> template) {
-        return args -> {
-            template.send(TOPIC_NAME, "test message at bootstrap");
-        };
+        return args -> template.send(TOPIC_NAME, "test message at bootstrap");
     }
 }
